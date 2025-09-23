@@ -11,7 +11,7 @@ add_library(glad
     thirdparty/glad/src/glad.c
 )
 
-target_include_directories(glad PUBLIC thirdparty/glad/include)
+target_include_directories(glad PUBLIC thirdparty/glad/include thirdparty/nuklear)
 
 file(GLOB_RECURSE SOURCES src/*.c)
 
