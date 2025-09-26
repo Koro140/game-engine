@@ -1,216 +1,113 @@
-#include <glad/glad.h>
-#define GLFW_INCLUDE_NONE
-#include <glfw/glfw3.h>
-
-
-#include "ui.h"
-
-#include "linmath.h"
-
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <errno.h>
+#include <utils.h>
 
-calculator(struct nk_context* ctx)
-{
-    if (nk_begin(ctx, "Calculator", nk_rect(10, 10, 180, 250),
-        NK_WINDOW_BORDER | NK_WINDOW_NO_SCROLLBAR | NK_WINDOW_MOVABLE))
-    {
-        static int set = 0, prev = 0, op = 0;
-        static const char numbers[] = "789456123";
-        static const char ops[] = "+-*/";
-        static double a = 0, b = 0;
-        static double* current = &a;
+#include "GFXAPI.h"
+#include <renderer.h>
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
 
-        size_t i = 0;
-        int solve = 0;
-        {
-            int len; char buffer[256];
-            nk_layout_row_dynamic(ctx, 35, 1);
-            len = snprintf(buffer, 256, "%.2f", *current);
-            nk_edit_string(ctx, NK_EDIT_SIMPLE, buffer, &len, 255, nk_filter_float);
-            buffer[len] = 0;
-            *current = atof(buffer);
-        }
+#define WINDOW_WIDTH 800
+#define WINDOW_HEIGHT 800
+#define WINDOW_NAME "GAME"
 
-        nk_layout_row_dynamic(ctx, 35, 4);
-        for (i = 0; i < 16; ++i) {
-            if (i >= 12 && i < 15) {
-                if (i > 12) continue;
-                if (nk_button_label(ctx, "C")) {
-                    a = b = op = 0; current = &a; set = 0;
-                } if (nk_button_label(ctx, "0")) {
-                    *current = *current * 10.0f; set = 0;
-                } if (nk_button_label(ctx, "=")) {
-                    solve = 1; prev = op; op = 0;
-                }
-            }
-            else if (((i + 1) % 4)) {
-                if (nk_button_text(ctx, &numbers[(i / 4) * 3 + i % 4], 1)) {
-                    *current = *current * 10.0f + numbers[(i / 4) * 3 + i % 4] - '0';
-                    set = 0;
-                }
-            }
-            else if (nk_button_text(ctx, &ops[i / 4], 1)) {
-                if (!set) {
-                    if (current != &b) {
-                        current = &b;
-                    }
-                    else {
-                        prev = op;
-                        solve = 1;
-                    }
-                }
-                op = ops[i / 4];
-                set = 1;
-            }
-        }
-        if (solve) {
-            if (prev == '+') a = a + b;
-            if (prev == '-') a = a - b;
-            if (prev == '*') a = a * b;
-            if (prev == '/') a = a / b;
-            current = &a;
-            if (set) current = &b;
-            b = 0; set = 0;
-        }
-    }
-    nk_end(ctx);
+static void error_callback(int error, const char* description) {
+	fprintf(stderr, "Error : %s", description);
 }
 
-
-static const struct
-{
-    float x, y;
-    float r, g, b;
-} vertices[3] =
-{
-    { -0.6f, -0.4f, 1.f, 0.f, 0.f },
-    {  0.6f, -0.4f, 0.f, 1.f, 0.f },
-    {   0.f,  0.6f, 0.f, 0.f, 1.f }
-};
-
-static const char* vertex_shader_text =
-"#version 110\n"
-"uniform mat4 MVP;\n"
-"attribute vec3 vCol;\n"
-"attribute vec2 vPos;\n"
-"varying vec3 color;\n"
-"void main()\n"
-"{\n"
-"    gl_Position = MVP * vec4(vPos, 0.0, 1.0);\n"
-"    color = vCol;\n"
-"}\n";
-
-static const char* fragment_shader_text =
-"#version 110\n"
-"varying vec3 color;\n"
-"void main()\n"
-"{\n"
-"    gl_FragColor = vec4(color, 1.0);\n"
-"}\n";
-
-static void error_callback(int error, const char* description)
-{
-    fprintf(stderr, "Error: %s\n", description);
+static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+	if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE)
+	{
+		glfwSetWindowShouldClose(window, GLFW_TRUE);
+	}
 }
 
-static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
-{
-    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
-        glfwSetWindowShouldClose(window, GLFW_TRUE);
+static void setInceremnt(float value,float* inc, float bound) {
+	if (value <= 0 || value >= bound) {
+		*inc = -(*inc);
+	}
 }
 
-int main(void)
-{
-    GLFWwindow* window;
-    GLuint vertex_buffer, vertex_shader, fragment_shader, program;
-    GLint mvp_location, vpos_location, vcol_location;
+int main(void) {
+	if (!glfwInit()) {
+		fprintf(stderr,"Couldn't initialize GLFW");
+		return 1;
+	}
 
-    glfwSetErrorCallback(error_callback);
+	glfwSetErrorCallback(error_callback);
 
-    if (!glfwInit())
-        exit(EXIT_FAILURE);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+	GLFWwindow* window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_NAME, NULL, NULL);
+	if (window == NULL) {
+		fprintf(stderr,"Couldn't create GLFW window");
+		glfwTerminate();
+		return 1;
+	}
 
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+	glfwSetKeyCallback(window, key_callback);
+	
+	glfwMakeContextCurrent(window);
+	gladLoadGLLoader(glfwGetProcAddress);
+	glfwSwapInterval(1);
 
-    window = glfwCreateWindow(640, 480, "Simple example", NULL, NULL);
-    if (!window)
-    {
-        glfwTerminate();
-        exit(EXIT_FAILURE);
-    }
+	float vertices[] = {
+		//   x      y       r     g     b
+		 0.0f,  0.6f,    1.0f, 0.0f, 0.0f, // 0 top
+		 0.52f, 0.3f,    0.0f, 1.0f, 0.0f, // 1 top-right
+		 0.52f,-0.3f,    0.0f, 0.0f, 1.0f, // 2 bottom-right
+		 0.0f, -0.6f,    1.0f, 1.0f, 0.0f, // 3 bottom
+		-0.52f,-0.3f,    1.0f, 0.0f, 1.0f, // 4 bottom-left
+		-0.52f, 0.3f,    0.0f, 1.0f, 1.0f  // 5 top-left
+	};
 
-    glfwSetKeyCallback(window, key_callback);
+	unsigned int indices[] = {
+		0,1,5,
+		1,2,4,
+		4,5,1,
+		2,3,4
+	};
 
-    glfwMakeContextCurrent(window);
-    gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
-    glfwSwapInterval(1);
 
-    // NOTE: OpenGL error checks have been omitted for brevity
+	VertexBuffer v_buff = VertexBufferCreate(vertices, sizeof(vertices));
+	VertexBufferBind(v_buff);
 
-    glGenBuffers(1, &vertex_buffer);
-    glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+	VertexArray vao = VertexArrayCreate();
+	VertexArrayBind(vao);
 
-    vertex_shader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertex_shader, 1, &vertex_shader_text, NULL);
-    glCompileShader(vertex_shader);
+	VertexLayout layout = VertexLayoutCreate();
+	VertexLayoutPush(&layout, GFX_FLOAT, 2, false); /// POSITION DATA 0
+	VertexLayoutPush(&layout, GFX_FLOAT, 3, false); /// COLOR DATA 1
 
-    fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragment_shader, 1, &fragment_shader_text, NULL);
-    glCompileShader(fragment_shader);
+	VertexArrayApplyLayout(vao, &layout);
 
-    program = glCreateProgram();
-    glAttachShader(program, vertex_shader);
-    glAttachShader(program, fragment_shader);
-    glLinkProgram(program);
+	VertexLayoutDelete(&layout);
+	
+	IndexBuffer i_buff= IndexBufferCreate(indices, sizeof(indices) / sizeof(int));
+	IndexBufferBind(i_buff);
 
-    mvp_location = glGetUniformLocation(program, "MVP");
-    vpos_location = glGetAttribLocation(program, "vPos");
-    vcol_location = glGetAttribLocation(program, "vCol");
+	Shader shader_program = ShaderCreate(RESOURCES_PATH "shaders/vertex.glsl", RESOURCES_PATH "shaders/fragment.glsl");
+	ShaderUse(shader_program);
 
-    glEnableVertexAttribArray(vpos_location);
-    glVertexAttribPointer(vpos_location, 2, GL_FLOAT, GL_FALSE,
-        sizeof(vertices[0]), (void*)0);
-    glEnableVertexAttribArray(vcol_location);
-    glVertexAttribPointer(vcol_location, 3, GL_FLOAT, GL_FALSE,
-        sizeof(vertices[0]), (void*)(sizeof(float) * 2));
+	while (!glfwWindowShouldClose(window)) {
+		glfwPollEvents();
+		
+		int width, height;
+		glfwGetFramebufferSize(window, &width, &height);
 
-    initUI(window);
+		GLCALL(glViewport(0, 0, width, height));
+		GLCALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 
-    while (!glfwWindowShouldClose(window))
-    {
-        float ratio;
-        int width, height;
-        mat4x4 m, p, mvp;
+		IndexBufferBind(i_buff);
+		GLCALL(glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(int), GL_UNSIGNED_INT, NULL));
+		
+		glfwSwapBuffers(window);
+	}
 
-        glfwGetFramebufferSize(window, &width, &height);
-        ratio = width / (float)height;
+	VertexBufferDestroy(v_buff);
+	IndexBufferDestroy(i_buff);
 
-        glViewport(0, 0, width, height);
-        glClear(GL_COLOR_BUFFER_BIT);
-
-        mat4x4_identity(m);
-        mat4x4_rotate_Z(m, m, (float)glfwGetTime());
-        mat4x4_ortho(p, -ratio, ratio, -1.f, 1.f, 1.f, -1.f);
-        mat4x4_mul(mvp, p, m);
-
-        glUseProgram(program);
-        glUniformMatrix4fv(mvp_location, 1, GL_FALSE, (const GLfloat*)mvp);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
-        
-        startRenderUI();
-        calculator(ctx);
-        endRenderUI();
-
-        glfwSwapBuffers(window);
-        glfwPollEvents();
-    }
-
-    void quitUI();
-    glfwDestroyWindow(window);
-
-    glfwTerminate();
-    exit(EXIT_SUCCESS);
+	glfwDestroyWindow(window);
+	glfwTerminate();
+	return 0;
 }
