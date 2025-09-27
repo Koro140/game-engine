@@ -48,7 +48,7 @@ int main(void) {
 	glfwSetKeyCallback(window, key_callback);
 	
 	glfwMakeContextCurrent(window);
-	gladLoadGLLoader(glfwGetProcAddress);
+	gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
 	glfwSwapInterval(1);
 
 	float vertices[] = {

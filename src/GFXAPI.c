@@ -6,6 +6,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#include <assert.h>
+#define static_assert _Static_assert
+
 static GLenum MapGFXTypesGL(GFX_TYPES types) {
 	switch (types)
 	{
