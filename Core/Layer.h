@@ -1,7 +1,15 @@
-class Layer
+#pragma once
+
+namespace Engine
 {
-private:
-public:
-    Layer() {}
-    ~Layer() {}
-};
+    class Layer
+    {
+    private:
+    public:
+        ~Layer() = default;
+
+        virtual void OnUpdate(float deltaTime) {};
+        virtual void OnEvent() {};
+        virtual void OnRender() {};
+    };    
+}

@@ -1,7 +1,17 @@
+#pragma once
+
 #include <string>
 
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
+
+#include "Layer.h"  
+
+#include <string>
+#include <memory>
+#include <vector>
+#include <set>
+#include <functional>
 
 namespace Engine
 {
@@ -15,13 +25,34 @@ namespace Engine
     class Application
     {
     private:
-        GLFWwindow* window;
-        bool appRunning;
+        GLFWwindow* m_Window;
+        bool m_AppRunning;
+
+        std::vector<std::unique_ptr<Layer>> m_LayerStack;
     public:
         Application(const ApplicationSettings& settings);
         ~Application();
-        
-        void attachLayer();
         void run();
+        
+		template<typename TLayer>
+		requires(std::is_base_of_v<Layer, TLayer>)
+		void PushLayer()
+		{
+			m_LayerStack.push_back(std::make_unique<TLayer>());
+		}
+
+        template<typename TLayer>
+		requires(std::is_base_of_v<Layer, TLayer>)
+		TLayer* GetLayer()
+		{
+			for (const auto& layer : m_LayerStack)
+			{
+				if (auto casted = dynamic_cast<TLayer*>(layer.get()))
+					return casted;
+			}
+			return nullptr;
+		}
+
+        friend class Layer;
     };    
 }

@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.12)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(CMAKE_CXX_STANDARD 20)
 
 project(GameEngine)
 
@@ -35,6 +36,7 @@ add_executable(GameEngine
 	${SRC}
 	
 	App/main.cpp
+	App/AppLayer.cpp
 )
 target_compile_definitions(GameEngine PUBLIC "RESOURCES_PATH=\"${CMAKE_SOURCE_DIR}/res/\"")
 target_link_libraries(GameEngine PRIVATE glm::glm glfw)

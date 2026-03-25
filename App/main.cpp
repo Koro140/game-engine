@@ -1,10 +1,6 @@
-#include "glad/glad.h"
-#include <GLFW/glfw3.h>
-#include <glm/glm.hpp>
-
 #include "Core/Application.h"
-#include "Core/Renderer/Shader.h"
-#include "Core/Renderer/Texture.h"
+
+#include "App/AppLayer.h"
 
 int main(void) {
     Engine::ApplicationSettings settings;
@@ -14,5 +10,7 @@ int main(void) {
     settings.windowWidth = 1280;
     Engine::Application app(settings);
 
+    app.PushLayer<AppLayer>();
+    
     app.run();
 }

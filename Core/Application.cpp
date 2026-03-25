@@ -9,18 +9,18 @@
 
 Engine::Application::Application(const ApplicationSettings& settings)
 {
-    window = nullptr;
-    appRunning = false;
+    m_Window = nullptr;
+    m_AppRunning = false;
 
     glfwInit();
-    window = glfwCreateWindow(settings.windowWidth, settings.windowHeight, settings.appName.c_str(), NULL, NULL);
-    if (window == nullptr) {
+    m_Window = glfwCreateWindow(settings.windowWidth, settings.windowHeight, settings.appName.c_str(), NULL, NULL);
+    if (m_Window == nullptr) {
         std::cerr << "Couldn't initialize window\n";
         glfwTerminate();
         return;
     }
     
-    glfwMakeContextCurrent(window);
+    glfwMakeContextCurrent(m_Window);
     gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
 
     // INITIALIZE ALL SUBSYSTEMS HERE
@@ -28,17 +28,31 @@ Engine::Application::Application(const ApplicationSettings& settings)
 
 
     // set appRunning if everythig went right
-    appRunning = true;
+    m_AppRunning = true;
 }
 
-void Engine::Application::run() {
-    while (appRunning && !glfwWindowShouldClose(window))
+void Engine::Application::run()
+{
+    float lastFrameTime = 0;
+    while (m_AppRunning && !glfwWindowShouldClose(m_Window))
     {
-        glfwPollEvents();
-        glClearColor(0.392f, 0.584f, 0.929f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        float currentFrameTime = static_cast<float>(glfwGetTime());
+        float deltaTime = currentFrameTime - lastFrameTime;
+        lastFrameTime = currentFrameTime;
 
-        glfwSwapBuffers(this->window);
+        glfwPollEvents();
+        
+        for (const std::unique_ptr<Layer>& layer : m_LayerStack)
+        {
+            layer->OnUpdate(deltaTime);
+        }
+        
+        for (const std::unique_ptr<Layer>& layer : m_LayerStack)
+        {
+            layer->OnRender();
+        }
+
+        glfwSwapBuffers(this->m_Window);
     }
 }
 
@@ -48,6 +62,6 @@ Engine::Application::~Application() {
     renderer.destroy();
 
 
-    glfwDestroyWindow(window);
+    glfwDestroyWindow(m_Window);
     glfwTerminate();
 }
