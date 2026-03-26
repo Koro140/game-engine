@@ -14,9 +14,5 @@ int main(void) {
     Engine::Application app(settings);
 
     app.PushLayer<AppLayer>();
-    app.PushLayer<PauseLayer>();
-
-    app.PopLayer();
-
     app.run();
 }

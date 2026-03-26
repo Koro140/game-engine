@@ -34,6 +34,7 @@ namespace Engine
         Application(const ApplicationSettings& settings);
         ~Application();
         void run();
+        void stop();
 		
 		GLFWwindow* GetWindow() {
 			return m_Window;

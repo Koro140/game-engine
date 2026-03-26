@@ -27,7 +27,6 @@ set(
     Core/Model.cpp
 
     Core/Renderer/Renderer.cpp
-    Core/Renderer/Renderer2D.cpp
     Core/Renderer/Shader.cpp
     Core/Renderer/Texture.cpp
 

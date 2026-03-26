@@ -7,7 +7,6 @@
 
 #include "Core/Input/Input.h"
 #include "Core/Renderer/Renderer.h"
-#include "Core/Renderer/Renderer2D.h"
 
 namespace Engine
 {
@@ -34,8 +33,13 @@ namespace Engine
         gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
 
         // INITIALIZE ALL SUBSYSTEMS HERE
-        Renderer2D& renderer = Renderer2D::getInstance();
-
+        // TODO :: move this to the renderer and create a callback for window resizing
+        int windowFrameBufferWidth;
+        int windowFrameBufferHeight;
+        glfwGetFramebufferSize(m_Window, &windowFrameBufferWidth, &windowFrameBufferHeight);
+        glViewport(0,0, windowFrameBufferWidth, windowFrameBufferHeight);
+        Renderer::InitializeQuad();
+        
         // set appRunning if everythig went right
         m_AppRunning = true;
     }
@@ -71,11 +75,14 @@ namespace Engine
         }
     }
 
+    void Application::stop()
+    {
+        m_AppRunning = false;
+    }
+
     Application::~Application() {
         // Destroy all subsystems here
-        Renderer2D& renderer = Renderer2D::getInstance();
-        renderer.destroy();
-
+        Renderer::DestroyQuad();
 
         glfwDestroyWindow(m_Window);
         glfwTerminate();

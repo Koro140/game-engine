@@ -1,23 +1,21 @@
+#pragma once
+
 #include "Texture.h"
+#include "Core/Common/structs.h"
 
 namespace Engine
 {
-    class Renderer
+    namespace Renderer
     {
-    public:
-        static Renderer& getInstance() {
-            static Renderer renderer;
-            return renderer;
-        }
+        struct Color {
+            unsigned char r;
+            unsigned char g;
+            unsigned char b;
+            unsigned char a;
+        };
 
-    private:
-        Renderer() {}
-        ~Renderer() {}
-
-        // deleting operators
-        Renderer(const Renderer&) = delete;
-        Renderer& operator=(const Renderer&) = delete;
-        Renderer(Renderer&&) = delete;
-        Renderer& operator=(Renderer&&) = delete;
-    };
+        void InitializeQuad();
+        void DestroyQuad();
+        void DrawTexture(Texture &texture, Rectangle destination, float rotation, Color color);
+    }
 }
