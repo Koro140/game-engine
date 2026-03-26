@@ -8,6 +8,9 @@
 #include "Core/Renderer/Texture.h"
 #include "Core/Renderer/Renderer2D.h"
 #include "Core/Input/Input.h"
+#include "Core/Application.h"
+
+#include "PauseLayer.h"
 
 #include <iostream>
 
@@ -15,11 +18,18 @@ using namespace Engine;
 
 void AppLayer::OnUpdate(float deltaTime)
 {
-    if (Input::GetKeyPressed(Input::Key_Code::KEY_CODE_1))
+    if (Input::GetKeyPressed(Input::KEY_CODE_ESCAPE))
     {
-        std::cout << "Pressed 1\n";
+        if (!gamePaused)
+        {
+            Application::Get().PushLayer<PauseLayer>();
+            gamePaused = true;
+        }
+        else {
+            Application::Get().PopLayer();
+            gamePaused = false;
+        }
     }
-    
 }
 
 void AppLayer::OnRender()

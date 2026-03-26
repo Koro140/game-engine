@@ -144,13 +144,18 @@ namespace Engine
             KEY_CODE_MENU          =     348,
         };
 
+        void Update();
         
         // Keyboard related functions
         bool GetKeyPressed(Key_Code keyCode);
+        bool GetKeyDown(Key_Code keyCode);
+        bool GetKeyUp(Key_Code keyCode);
         bool GetKeyReleased(Key_Code keyCode);
 
         // Mouse related functions
         bool GetMouseButtonPressed(Mouse_Button mouseButton);
+        bool GetMouseButtonDown(Mouse_Button mouseButton);
+        bool GetMouseButtonUp(Mouse_Button mouseButton);
         bool GetMouseButtonReleased(Mouse_Button mouseButton);
         void GetMousePosition(double &x, double &y);
     }

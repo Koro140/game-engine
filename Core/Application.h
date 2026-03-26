@@ -29,6 +29,7 @@ namespace Engine
         bool m_AppRunning;
 
         std::vector<std::unique_ptr<Layer>> m_LayerStack;
+        std::vector<std::function<void()>> m_CommandLayerStack;
     public:
         Application(const ApplicationSettings& settings);
         ~Application();
@@ -42,12 +43,17 @@ namespace Engine
 		requires(std::is_base_of_v<Layer, TLayer>)
 		void PushLayer()
 		{
-			m_LayerStack.push_back(std::make_unique<TLayer>());
+			m_CommandLayerStack.push_back([this]() {
+				m_LayerStack.push_back(std::make_unique<TLayer>());
+			});
 		}
 		
 		void PopLayer()
 		{
-			m_LayerStack.pop_back();
+			m_CommandLayerStack.push_back([this]() {
+				if (!m_LayerStack.empty())
+					m_LayerStack.pop_back();
+			});
 		}
 		
         template<typename TLayer>

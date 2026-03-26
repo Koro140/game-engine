@@ -5,6 +5,7 @@
 #include <iostream>
 #include <assert.h>
 
+#include "Core/Input/Input.h"
 #include "Core/Renderer/Renderer.h"
 #include "Core/Renderer/Renderer2D.h"
 
@@ -35,7 +36,6 @@ namespace Engine
         // INITIALIZE ALL SUBSYSTEMS HERE
         Renderer2D& renderer = Renderer2D::getInstance();
 
-
         // set appRunning if everythig went right
         m_AppRunning = true;
     }
@@ -50,16 +50,22 @@ namespace Engine
             lastFrameTime = currentFrameTime;
 
             glfwPollEvents();
+            
+            // Update all subsystems here
+            Input::Update();
 
-            for (const std::unique_ptr<Layer>& layer : m_LayerStack)
-            {
+            for (std::unique_ptr<Layer>& layer : m_LayerStack) {
                 layer->OnUpdate(deltaTime);
             }
 
-            for (const std::unique_ptr<Layer>& layer : m_LayerStack)
-            {
+            for (std::unique_ptr<Layer>& layer : m_LayerStack) {
                 layer->OnRender();
             }
+
+            for (auto command : m_CommandLayerStack) {
+                command();
+            }
+            m_CommandLayerStack.clear();
 
             glfwSwapBuffers(this->m_Window);
         }
