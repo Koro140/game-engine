@@ -2,10 +2,8 @@
 
 #include "Core/Layer.h"
 
-class AppLayer : public Engine::Layer
+class PauseLayer : public Engine::Layer
 {
-private:
-    bool gamePaused;
 public:
     void OnUpdate(float deltaTime) override;
     void OnRender() override;

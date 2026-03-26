@@ -25,10 +25,13 @@ set(
 	SRC
     Core/Application.cpp
     Core/Model.cpp
+
     Core/Renderer/Renderer.cpp
     Core/Renderer/Renderer2D.cpp
     Core/Renderer/Shader.cpp
     Core/Renderer/Texture.cpp
+
+	Core/Input/Input.cpp
 )
 
 add_executable(GameEngine 
@@ -37,6 +40,7 @@ add_executable(GameEngine
 	
 	App/main.cpp
 	App/AppLayer.cpp
+	App/PauseLayer.cpp
 )
 target_compile_definitions(GameEngine PUBLIC "RESOURCES_PATH=\"${CMAKE_SOURCE_DIR}/res/\"")
 target_link_libraries(GameEngine PRIVATE glm::glm glfw)

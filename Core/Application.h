@@ -33,14 +33,23 @@ namespace Engine
         Application(const ApplicationSettings& settings);
         ~Application();
         void run();
-        
-		template<typename TLayer>
+		
+		GLFWwindow* GetWindow() {
+			return m_Window;
+		}
+
+        template<typename TLayer>
 		requires(std::is_base_of_v<Layer, TLayer>)
 		void PushLayer()
 		{
 			m_LayerStack.push_back(std::make_unique<TLayer>());
 		}
-
+		
+		void PopLayer()
+		{
+			m_LayerStack.pop_back();
+		}
+		
         template<typename TLayer>
 		requires(std::is_base_of_v<Layer, TLayer>)
 		TLayer* GetLayer()
@@ -48,11 +57,12 @@ namespace Engine
 			for (const auto& layer : m_LayerStack)
 			{
 				if (auto casted = dynamic_cast<TLayer*>(layer.get()))
-					return casted;
+				return casted;
 			}
 			return nullptr;
 		}
-
-        friend class Layer;
+		
+		static Application &Get();
+		friend class Layer;
     };    
 }
