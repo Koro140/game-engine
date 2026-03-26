@@ -11,3 +11,4 @@ The project uses CMake to build the project:
 cmake -S . -B build
 cd build
 cmake --build build
+```
