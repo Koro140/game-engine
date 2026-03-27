@@ -52,8 +52,8 @@ void AppLayer::OnUpdate(float deltaTime)
 
 void AppLayer::OnRender()
 {
-    glClearColor(0.2f, 0.5f, 0.5f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+    Renderer::ClearBackground(Renderer::GetColorFromF(0.2f, 0.5f, 0.5f, 1.0f));
     Renderer::DrawTexture(*testTexture, playerPosition, 0, {255,255,255,255});
+
+    Renderer::DrawTextureSlice(*testTexture, {0,0,testTexture->m_Width * 2.0f,testTexture->m_Height * 2.0f},{100,100,100,100}, 0, {255,255,255,255});
 }
