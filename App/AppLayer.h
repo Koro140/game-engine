@@ -9,7 +9,6 @@ class AppLayer : public Engine::Layer
 {
 private:
     bool gamePaused;
-    Engine::Texture testTexture;
     Engine::Rectangle playerPosition = {0,0,100,100};
 public:
     AppLayer();

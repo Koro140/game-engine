@@ -31,6 +31,8 @@ set(
     Core/Renderer/Texture.cpp
 
 	Core/Input/Input.cpp
+
+	Core/ResourceManager/ResourceManager.cpp
 )
 
 add_executable(GameEngine 

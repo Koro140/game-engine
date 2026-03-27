@@ -7,6 +7,7 @@
 #include "Core/Renderer/Renderer.h"
 #include "Core/Input/Input.h"
 #include "Core/Application.h"
+#include "Core/ResourceManager/ResourceManager.h"
 
 #include "PauseLayer.h"
 
@@ -14,8 +15,10 @@
 
 using namespace Engine;
 
-AppLayer::AppLayer() : testTexture(RESOURCES_PATH "textures/container.jpg") {
+Texture* testTexture;
 
+AppLayer::AppLayer() {
+    testTexture = ResourceManager::LoadTexture(RESOURCES_PATH "textures/container.jpg", "container_tex");
 }
 
 void AppLayer::OnUpdate(float deltaTime)
@@ -52,5 +55,5 @@ void AppLayer::OnRender()
     glClearColor(0.2f, 0.5f, 0.5f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    Renderer::DrawTexture(testTexture, playerPosition, 0, {255,255,255,255});
+    Renderer::DrawTexture(*testTexture, playerPosition, 0, {255,255,255,255});
 }

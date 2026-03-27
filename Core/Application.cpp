@@ -7,6 +7,7 @@
 
 #include "Core/Input/Input.h"
 #include "Core/Renderer/Renderer.h"
+#include "Core/ResourceManager/ResourceManager.h"
 
 namespace Engine
 {
@@ -83,7 +84,7 @@ namespace Engine
     Application::~Application() {
         // Destroy all subsystems here
         Renderer::DestroyQuad();
-
+        ResourceManager::clear();
         glfwDestroyWindow(m_Window);
         glfwTerminate();
     }
