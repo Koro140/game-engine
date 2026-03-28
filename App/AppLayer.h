@@ -5,13 +5,20 @@
 
 #include "Core/Common/structs.h"
 
+#include <entt/entt.hpp>
+
 class AppLayer : public Engine::Layer
 {
-private:
-    bool gamePaused;
-    Engine::Rectangle playerPosition = {0,0,100,100};
-public:
+public:    
     AppLayer();
-    void OnUpdate(float deltaTime) override;
     void OnRender() override;
+    void OnUpdate(float deltaTime) override;
+
+private:
+    entt::registry m_registry;
+    entt::entity   m_player;
+
+    bool gamePaused = false;
+
+    void RendererSystem();
 };
