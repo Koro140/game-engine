@@ -43,6 +43,8 @@ set(SRC
     Core/Input/Input.cpp
 
     Core/ResourceManager/ResourceManager.cpp
+
+    Core/Physics/Physics.cpp
 )
 
 add_executable(GameEngine

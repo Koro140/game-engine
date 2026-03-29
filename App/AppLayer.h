@@ -18,6 +18,8 @@ private:
     entt::registry m_registry;
     entt::entity   m_player;
 
+    std::vector<entt::entity> m_cubesVec;
+
     bool gamePaused = false;
 
     void RendererSystem();
