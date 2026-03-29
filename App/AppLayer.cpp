@@ -31,7 +31,8 @@ AppLayer::AppLayer() {
     );
 
     auto& body = m_registry.get<Physics::ActorBody>(m_player);
-    body.useGravity = false;
+    body.useGravity = true;
+    body.drag = 3;
     
 
     m_registry.emplace<Physics::AABB>(m_player,
@@ -90,19 +91,14 @@ void AppLayer::OnUpdate(float deltaTime)
     auto& transform = m_registry.get<ECS::Transform>(m_player);
     auto& aabb = m_registry.get<Physics::AABB>(m_player);
 
-    body.velocity.x = 0.f;
-    body.velocity.y = 0.f;
-    
     float speed = 100.0f;
     if (Input::GetKeyDown(Input::KEY_CODE_DOWN))  body.velocity.y = speed;
     if (Input::GetKeyDown(Input::KEY_CODE_UP))    body.velocity.y = -speed;
     if (Input::GetKeyDown(Input::KEY_CODE_LEFT))  body.velocity.x = -speed;
     if (Input::GetKeyDown(Input::KEY_CODE_RIGHT)) body.velocity.x = speed;
-
-    transform.position = aabb.position;
-
+    
     Physics::UpdatePhysics(m_registry, deltaTime);
-
+    transform.position = aabb.position;    
 }
 
 void AppLayer::RendererSystem()

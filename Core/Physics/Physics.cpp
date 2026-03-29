@@ -69,7 +69,7 @@ namespace Engine::Physics
                 if (!Intersects(aabbA, aabbS, info)) {return;}
                 
                 float correction = std::max(info.depth - SLOP, 0.f) * CORRECTION;
-                aabbA.position -= info.normal * correction;
+                aabbA.position += info.normal;
 
                 float velDot = glm::dot(actor.velocity, info.normal);
                 if (velDot < 0.f)
