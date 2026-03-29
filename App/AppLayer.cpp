@@ -32,9 +32,9 @@ AppLayer::AppLayer() {
 
     auto& body = m_registry.get<Physics::ActorBody>(m_player);
     body.useGravity = true;
-    body.drag = 3;
+    body.drag = .3;
+    body.restitution = .1;
     
-
     m_registry.emplace<Physics::AABB>(m_player,
         Physics::AABB{{100,100},{100,100}}
     );
@@ -47,7 +47,7 @@ AppLayer::AppLayer() {
     m_cubesVec.push_back(m_registry.create());
 
     m_registry.emplace<ECS::Transform>(m_cubesVec[0],
-        glm::vec2{ 200.f, 200.f }, // position
+        glm::vec2{ 100.f, 300.f }, // position
         glm::vec2{ 200.f, 200.f },   // scale
         0.f      // rotation
     );
@@ -57,7 +57,7 @@ AppLayer::AppLayer() {
     );
 
     m_registry.emplace<Physics::AABB>(m_cubesVec[0],
-        Physics::AABB{{200,200},{200,200}}
+        Physics::AABB{{100,300},{200,200}}
     );
 
     m_registry.emplace<ECS::Sprite>(m_cubesVec[0],

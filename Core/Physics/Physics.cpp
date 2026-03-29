@@ -4,9 +4,8 @@
 
 namespace Engine::Physics
 {   
-    static constexpr glm::vec2 GRAVITY    {0.f, 9.81f};
-    static constexpr float     SLOP       {0.01f};
-    static constexpr float     CORRECTION {0.8f};
+    static constexpr float PIXEL_PER_METER    {100.f};
+    static constexpr glm::vec2 GRAVITY    {0.f, 9.81f * PIXEL_PER_METER};
 
     // Check for intersections
     bool Intersects(const AABB &a, const AABB &b, CollisionInfo &infoOut)
@@ -68,8 +67,7 @@ namespace Engine::Physics
                 CollisionInfo info;
                 if (!Intersects(aabbA, aabbS, info)) {return;}
                 
-                float correction = std::max(info.depth - SLOP, 0.f) * CORRECTION;
-                aabbA.position += info.normal;
+                aabbA.position += info.normal * info.depth;
 
                 float velDot = glm::dot(actor.velocity, info.normal);
                 if (velDot < 0.f)
