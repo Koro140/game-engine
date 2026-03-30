@@ -7,6 +7,7 @@
 
 static std::map<std::string, std::unique_ptr<Engine::Shader>> s_shaderMap;
 static std::map<std::string, std::unique_ptr<Engine::Texture>> s_textureMap;
+static std::map<std::string, std::unique_ptr<Engine::Audio>> s_audioMap;
 
 namespace Engine
 {
@@ -57,8 +58,26 @@ namespace Engine
         return nullptr;
     }
 
+    Audio *ResourceManager::LoadAudio(const char *filePath, const std::string &name)
+    {
+        std::unique_ptr<Audio> audio = std::make_unique<Audio>(filePath);
+        s_audioMap[name] = std::move(audio);
+        return s_audioMap[name].get();
+    }
+
+    Audio *ResourceManager::GetAudio(const std::string &name)
+    {
+        auto it = s_audioMap.find(name);
+        if (it != s_audioMap.end())
+        {
+            return it->second.get();
+        }
+        return nullptr;
+    }
+
     void ResourceManager::clear() {
         s_shaderMap.clear();
         s_textureMap.clear();
+        s_audioMap.clear();
     }
 }

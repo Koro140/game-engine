@@ -19,7 +19,7 @@ using namespace Engine;
 
 AppLayer::AppLayer() {
     m_player = m_registry.create();
-
+    
     m_registry.emplace<ECS::Transform>(m_player,
         glm::vec2{ 100.f, 100.f }, // position
         glm::vec2{ 100.f, 100.f },   // scale
@@ -32,8 +32,8 @@ AppLayer::AppLayer() {
 
     auto& body = m_registry.get<Physics::ActorBody>(m_player);
     body.useGravity = true;
-    body.drag = .3;
-    body.restitution = .1;
+    body.drag = 5.f;
+    body.restitution = 0.7f;
     
     m_registry.emplace<Physics::AABB>(m_player,
         Physics::AABB{{100,100},{100,100}}
@@ -64,6 +64,8 @@ AppLayer::AppLayer() {
         ResourceManager::GetTexture("container_tex"),
         Renderer::Color{255,255,255,255}
     );
+
+    ResourceManager::LoadAudio(RESOURCES_PATH "audio/jump.wav", "jump");
 }
 
 void AppLayer::OnUpdate(float deltaTime)
@@ -97,6 +99,14 @@ void AppLayer::OnUpdate(float deltaTime)
     if (Input::GetKeyDown(Input::KEY_CODE_LEFT))  body.velocity.x = -speed;
     if (Input::GetKeyDown(Input::KEY_CODE_RIGHT)) body.velocity.x = speed;
     
+    // Player Jump
+    if (Input::GetKeyPressed(Input::KEY_CODE_SPACE))
+    {
+        ResourceManager::GetAudio("jump")->play();
+        body.velocity.y = -1000.0f;
+    }
+    
+
     Physics::UpdatePhysics(m_registry, deltaTime);
     transform.position = aabb.position;    
 }

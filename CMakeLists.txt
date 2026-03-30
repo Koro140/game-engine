@@ -28,7 +28,15 @@ FetchContent_Declare(
     GIT_TAG        v3.13.2
 )
 
-FetchContent_MakeAvailable(glm entt)
+# SFML - for audio
+FetchContent_Declare(
+    sfml
+    GIT_REPOSITORY https://github.com/SFML/SFML.git
+    GIT_TAG        3.0.2
+)
+
+set(SFML_BUILD_AUDIO ON)
+FetchContent_MakeAvailable(glm entt sfml)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
@@ -45,6 +53,8 @@ set(SRC
     Core/ResourceManager/ResourceManager.cpp
 
     Core/Physics/Physics.cpp
+
+    Core/Audio/Audio.cpp
 )
 
 add_executable(GameEngine
@@ -62,4 +72,5 @@ target_link_libraries(GameEngine PRIVATE
     glm::glm
     glfw
     EnTT::EnTT
+    sfml-audio
 )
